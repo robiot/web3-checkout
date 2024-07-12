@@ -13,6 +13,7 @@ importers:
       '@radix-ui/react-select': ^2.0.0
       '@radix-ui/react-slot': ^1.0.2
       '@tanstack/react-query': ^5.28.4
+      '@tanstack/react-table': ^8.19.2
       '@types/mdx': ^2.0.10
       '@types/node': ^20
       '@types/react': ^18
@@ -55,6 +56,7 @@ importers:
       '@radix-ui/react-select': 2.1.1_ma437sazqanxqsgjws34kond6i
       '@radix-ui/react-slot': 1.1.0_3vdbhqr2ncalcx7opnshezpx3q
       '@tanstack/react-query': 5.51.1_react@18.3.1
+      '@tanstack/react-table': 8.19.2_nnrd3gsncyragczmpvfhocinkq
       '@web3modal/wagmi': 5.0.6_2aajwfqxahx32hmilq3p6i4a2i
       '@worldcoin/idkit': 1.2.2_gbqznzwi5ty4j7stvnugyr7bk4
       class-variance-authority: 0.7.0
@@ -1769,6 +1771,23 @@ packages:
     dependencies:
       '@tanstack/query-core': 5.51.1
       react: 18.3.1
+    dev: false
+
+  /@tanstack/react-table/8.19.2_nnrd3gsncyragczmpvfhocinkq:
+    resolution: {integrity: sha512-itoSIAkA/Vsg+bjY23FSemcTyPhc5/1YjYyaMsr9QSH/cdbZnQxHVWrpWn0Sp2BWN71qkzR7e5ye8WuMmwyOjg==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+    dependencies:
+      '@tanstack/table-core': 8.19.2
+      react: 18.3.1
+      react-dom: 18.3.1_react@18.3.1
+    dev: false
+
+  /@tanstack/table-core/8.19.2:
+    resolution: {integrity: sha512-KpRjhgehIhbfH78ARm/GJDXGnpdw4bCg3qas6yjWSi7czJhI/J6pWln7NHtmBkGE9ZbohiiNtLqwGzKmBfixig==}
+    engines: {node: '>=12'}
     dev: false
 
   /@types/acorn/4.0.6:
