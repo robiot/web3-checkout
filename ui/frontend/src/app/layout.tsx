@@ -10,6 +10,10 @@ import { MetaDescription, MetaTitle } from "@/lib/content/meta";
 import { cn } from "@/lib/utils";
 import { ClientProviders } from "@/components/ClientProviders";
 
+import { cookieToInitialState } from 'wagmi';
+import { config } from "@/lib/WagmiConfig";
+import { headers } from 'next/headers';
+
 const inter = Inter({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -31,10 +35,12 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const initialState = cookieToInitialState(config, headers().get('cookie'))
+
   return (
     <html lang="en">
       <body className={cn(inter.className, "bg-background text-foreground")}>
-        <ClientProviders>
+        <ClientProviders initialState={initialState}>
           {children}
 
           <Analytics />
