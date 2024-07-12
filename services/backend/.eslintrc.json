@@ -1,0 +1,25 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+      "ecmaVersion": 2022
+  },
+  "extends": ["plugin:robiot/recommended"],
+  "ignorePatterns": ["!**/*", "*.cjs", "*.mdx"],
+  "plugins": ["robiot"],
+  "env": {
+      "node": true,
+      "browser": true
+  },
+  "settings": {
+  },
+  "overrides": [
+    {
+      "files": "*.mdx",
+      // "parser": "eslint-mdx", // enable `eslint-mdx` manually if it does not work
+      "extends": "plugin:mdx/recommended"
+    }
+  ],
+  "globals": {
+      "JSX": "readonly"
+  }
+}
