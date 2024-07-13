@@ -1,12 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { useAccount } from "wagmi";
 
 import { Container } from "@/components/common/Container";
 import { Stars } from "@/components/common/Stars";
-import { Button } from "@/components/ui/button";
 
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
@@ -27,8 +25,6 @@ const CheckoutPage = () => {
   //   },
   // });
   const account = useAccount();
-
-  const [page, setPage] = useState<"connect" | "verify" | "pay">("connect");
 
   return (
     <div className="flex flex-col md:flex-row h-screen mx-auto">
@@ -74,16 +70,18 @@ const CheckoutPage = () => {
         <Container className="mr-auto md:ml-20 max-w-[25rem]">
           <div className="text-lx pt-20">Pay with crypto</div>
 
-          <div className="border border-border p-4 rounded-xl mt-8">
+          <div className="mt-8">
             <div className="flex items-center gap-5">
               <Stars percent={80} />
               <span className="text-foreground/60">140 reviews</span>
             </div>
 
-            <Button variant="secondary" className="w-full mt-6">
+            {/* <Button variant="ghost" className="w-full mt-6">
               View reviews
-            </Button>
+            </Button> */}
           </div>
+
+          <div className="border-t border-border w-full mt-7" />
 
           <div className="flex justify-between py-6">
             <span>Total</span>
@@ -92,16 +90,13 @@ const CheckoutPage = () => {
 
           <div className="border-t border-border w-full" />
 
-          <div className="pt-6">
-            {page == "connect" && (
-              <ConnectPage
-                next={() => {
-                  setPage("verify");
-                }}
-              />
-            )}
+          <div className="pt-6 flex flex-col gap-3">
+            <ConnectPage />
 
-            {page == "verify" && (
+            <VerifyPage />
+
+            <PayPage />
+            {/* {page == "verify" && (
               <VerifyPage
                 next={() => {
                   setPage("pay");
@@ -109,7 +104,7 @@ const CheckoutPage = () => {
               />
             )}
 
-            {page == "pay" && <PayPage next={() => {}} />}
+            {page == "pay" && <PayPage next={() => {}} />} */}
           </div>
         </Container>
       </div>
