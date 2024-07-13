@@ -5,7 +5,7 @@ import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { CheckoutABI } from "@/lib/abi";
+import { CheckoutABI } from "@/lib/contract_abi";
 import { enviroment } from "@/lib/enviroment";
 
 export const DeleteButton: FC<{ id: string }> = ({ id }) => {

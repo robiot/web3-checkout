@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckoutABI } from "@/lib/abi";
+import { CheckoutABI } from "@/lib/contract_abi";
 import { enviroment } from "@/lib/enviroment";
 import { hashObject } from "@/lib/utils";
 

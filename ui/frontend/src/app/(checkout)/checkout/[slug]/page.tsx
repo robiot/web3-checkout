@@ -19,7 +19,7 @@ interface PageProperties {
   };
 }
 
-const formatCurrency = (number_?: number) => ((number_ ?? 0) / 100).toFixed(2);
+const formatCurrency = (number_?: number) => (number_ ?? 0).toFixed(2);
 
 function CheckoutPage({ params }: PageProperties) {
   const product = useProductsSingle(params.slug);
@@ -88,9 +88,21 @@ function CheckoutPage({ params }: PageProperties) {
 
           <div className="border-t border-border w-full mt-7" />
 
-          <div className="flex justify-between py-6">
-            <span>Total</span>
-            <span>{formatCurrency(product.data?.price)} USD</span>
+          <div className="flex flex-col gap-2 py-4">
+            <div className="flex flex-col gap-1 text-sm text-gray-600">
+              <div className="flex justify-between">
+                <span>Product</span>
+                <span>{formatCurrency(product.data?.price)} USD</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Service Fee (6%)</span>
+                <span>{formatCurrency(product.data?.price! * 0.06)} USD</span>
+              </div>
+            </div>
+            <div className="flex justify-between">
+              <span>Total</span>
+              <span>{formatCurrency(product.data?.price! * 1.06)} USD</span>
+            </div>
           </div>
 
           <div className="border-t border-border w-full" />
@@ -98,11 +110,11 @@ function CheckoutPage({ params }: PageProperties) {
           <div className="pt-6 flex flex-col gap-3">
             <ConnectPage />
 
-            <VerifyPage />
+            {product.data?.limitPerHuman! > 0 && <VerifyPage />}
 
             {/* <Swap /> */}
 
-            <PayPage />
+            <PayPage id={params.slug} price={product.data?.price!} />
           </div>
         </Container>
       </div>
