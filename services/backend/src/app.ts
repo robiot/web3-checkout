@@ -16,6 +16,7 @@ export type Product = {
   requireWorldCoin: boolean;
   limitPerHuman: number;
   created_at: Date;
+  reviewSummary: string;
 };
 
 export type Review = {
@@ -43,6 +44,7 @@ export type Review = {
         table.boolean("requireWorldCoin");
         table.integer("limitPerHuman");
         table.datetime("created_at");
+        table.string("reviewSummary");
       });
       console.log("Created products table!");
     }

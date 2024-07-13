@@ -20,6 +20,16 @@ const ProductSchema = Type.Object({
   price: Type.Number(),
 });
 
+ProductHandler.get("/:id", async (request, response) => {
+  const data = await pg<Product>("products").select("*").where({
+    id: request.params.id,
+  });
+
+  if (data.length === 0) return reject(response, 404);
+
+  return respond(response, 200, data[0]);
+});
+
 ProductHandler.get("/", async (request, response) => {
   const data = request.query.created_by
     ? await pg<Product>("products").select("*").where({
@@ -39,6 +49,7 @@ ProductHandler.post("/", async (request, response) => {
     id: randomUUID(),
     created_at: new Date(),
     ...request.body,
+    reviewSummary: "",
   };
 
   await pg<Product>("products").insert(newProduct);

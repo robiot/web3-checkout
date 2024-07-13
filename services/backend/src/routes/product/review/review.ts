@@ -2,10 +2,16 @@ import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
+import OpenAI from "openai";
 
-import { Review } from "../../../app";
+import { Product, Review } from "../../../app";
+import { generateReview } from "../../../lib/ai";
 import pg from "../../../pg";
 import { reject, respond } from "../../../util/response";
+
+const openai = new OpenAI({
+  apiKey: process.env["OPENAI_API_KEY"], // This is the default and can be omitted
+});
 
 const ReviewHandler = Router({
   mergeParams: true,
@@ -17,21 +23,33 @@ const ReviewSchema = Type.Object({
 });
 
 ReviewHandler.get("/", async (request, response) => {
-  const data = await pg<Review>("reviews").select("*");
-
-  return respond(
-    response,
-    200,
-    data.filter((d) => d.product_id === request.params.product_id),
+  // eslint-disable-next-line unicorn/no-await-expression-member
+  const data = (await pg<Review>("reviews").select("*")).filter(
+    (r) => r.product_id === request.params.product_id,
   );
+
+  const products = await pg<Product>("products").select("*");
+  const product = products.filter((p) => p.id === request.params.product_id);
+
+  if (product.length === 0) return reject(response, 500);
+
+  return respond(response, 200, {
+    summary: product[0].reviewSummary,
+    reviews: data,
+  });
 });
 
 ReviewHandler.post("/", async (request, response) => {
-  console.log(request.params);
+  const products = await pg<Product>("products").select("*");
+  const product = products.filter((p) => p.id === request.params.product_id);
+
+  if (product.length === 0) return reject(response, 404);
 
   if (!Value.Check(ReviewSchema, request.body)) {
     return reject(response, 400);
   }
+
+  await generateReview(product[0].id);
 
   const newReview: Review = {
     id: randomUUID(),
