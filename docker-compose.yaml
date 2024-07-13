@@ -19,7 +19,7 @@ services:
   #         - "6379:6379"
 
   frontend:
-    image: "node:18.15.0-slim"
+    image: "node:20.15.1-slim"
     volumes:
       - .:/app
     working_dir: /app/ui/frontend

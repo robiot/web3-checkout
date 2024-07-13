@@ -6,6 +6,7 @@ import {IWorldID} from "./interfaces/IWorldID.sol";
 import {IERC20} from "./interfaces/IErc20.sol";
 
 struct ProductMetadata {
+    bytes16 id;
     bytes32 h;
     uint256 price;
     uint256 purchase_limit;
@@ -14,7 +15,9 @@ struct ProductMetadata {
 }
 
 struct Review {
+    bytes16 id;
     bytes32 h;
+    bytes16 product_id;
 }
 
 contract Web3Checkout {
@@ -22,13 +25,13 @@ contract Web3Checkout {
 
     address internal immutable owner;
     uint256 internal immutable fee_percent;
-    IERC20 token;
+    IERC20 internal immutable token;
 
-    mapping(bytes32 => ProductMetadata) internal products;
-    mapping(bytes32 => Review) internal reviews;
-    mapping(address => mapping(bytes32 => uint256)) internal purchase_counts;
-
-    error DuplicateNullifier(uint256 nullifierHash);
+    mapping(bytes16 => ProductMetadata) internal products;
+    mapping(bytes16 => Review) internal reviews;
+    mapping(address => mapping(bytes16 => uint256)) internal purchase_counts_addr;
+    mapping(uint256 => mapping(bytes16 => uint256)) internal purchase_counts_worldid;
+    mapping(uint256 => mapping(bytes16 => bool)) internal reviews_submitted;
 
     IWorldID internal immutable worldId;
     uint256 internal immutable externalNullifier;
@@ -56,66 +59,97 @@ contract Web3Checkout {
         token = _token;
     }
 
-    function addProduct(bytes32 h, uint256 price, uint256 purchase_limit, address payee) public {
-        products[h] = ProductMetadata(h, price, purchase_limit, payee, msg.sender);
+    function hashOf(bytes16 id) public view returns (bytes32) {
+        return products[id].h;
     }
 
-    function removeProduct(bytes32 h) public {
-        require(products[h].controller == msg.sender);
-
-        delete products[h];
+    function hashOfReview(bytes16 id) public view returns (bytes32) {
+        return reviews[id].h
     }
 
-    function updateProduct(bytes32 h, uint256 price, uint256 purchase_limit, address payee, bytes32 new_h) public {
+    function addProduct(bytes16 id, bytes32 h, uint256 price, uint256 purchase_limit, address payee) public {
+        require(products[id].h == 0x0);
+        products[id] = ProductMetadata(id, h, price, purchase_limit, payee, msg.sender);
+    }
+
+    function removeProduct(bytes16 id) public {
+        require(products[id].controller == msg.sender);
+
+        delete products[id];
+    }
+
+    function updateProduct(bytes16 id, uint256 price, uint256 purchase_limit, address payee, bytes32 new_h) public {
         // ensures controller is msg.sender
-        removeProduct(h);
-        addProduct(new_h, price, purchase_limit, payee);
+        removeProduct(id);
+        addProduct(id, new_h, price, purchase_limit, payee);
     }
 
     function payout(address payable addr) public onlyOwner {
         token.transfer(addr, token.balanceOf(address(this)));
     }
 
-    function makePayment(bytes32 h) public payable {
-        ProductMetadata memory meta = products[h];
+    function makePayment(bytes16 id) public payable {
+        ProductMetadata memory meta = products[id];
+        require(meta.h != 0x0);
 
         require(meta.purchase_limit == 0);
 
         uint256 our_fee = meta.price * (fee_percent * 100) / 10_000;
-        uint256 to_pay = meta.price + our_fee;
-        require(msg.value >= to_pay);
 
-        ++purchase_counts[msg.sender][meta.h];
+        ++purchase_counts_addr[msg.sender][id];
 
-        token.transferFrom(msg.sender, meta.payee, meta.price);
-        token.transferFrom(msg.sender, address(this), msg.value - meta.price);
+        token.transferFrom(msg.sender, address(this), meta.price + our_fee);
+        token.transfer(meta.payee, meta.price);
     }
 
     function makePaymentWorldId(
-        bytes32 h,
+        bytes16 id,
         address signal,
         uint256 root,
         uint256 nullifierHash,
         uint256[8] calldata proof
     ) public payable {
-        if (nullifierHashes[nullifierHash]) revert DuplicateNullifier(nullifierHash);
+        worldId.verifyProof(
+            root, groupId, abi.encodePacked(signal).hashToField(), nullifierHash, externalNullifier, proof
+        );
 
-        worldId.verifyProof(root, groupId, abi.encodePacked(h).hashToField(), nullifierHash, externalNullifier, proof);
+        ProductMetadata memory meta = products[id];
+        require(meta.h != 0x0);
 
-        nullifierHashes[nullifierHash] = true;
-
-        ProductMetadata memory meta = products[h];
-        uint256 sender_limit = purchase_counts[msg.sender][meta.h];
+        uint256 sender_limit = purchase_counts_addr[msg.sender][id] + purchase_counts_worldid[nullifierHash][id];
 
         require(meta.purchase_limit > 0 && sender_limit < meta.purchase_limit);
 
         uint256 our_fee = meta.price * (fee_percent * 100) / 10_000;
-        uint256 to_pay = meta.price + our_fee;
-        require(msg.value >= to_pay);
+        
+        ++purchase_counts_worldid[nullifierHash][id];
 
-        ++purchase_counts[signal][meta.h];
+        token.transferFrom(msg.sender, address(this), meta.price + our_fee);
+        token.transfer(meta.payee, meta.price);
+    }
 
-        token.transferFrom(msg.sender, meta.payee, meta.price);
-        token.transferFrom(msg.sender, address(this), msg.value - meta.price);
+    function submitReview(
+        bytes16 product_id,
+        bytes16 id,
+        bytes32 h, 
+        address signal,
+        uint256 root,
+        uint256 nullifierHash,
+        uint256[8] calldata proof
+    ) public {
+        worldId.verifyProof(
+            root, groupId, abi.encodePacked(signal).hashToField(), nullifierHash, externalNullifier, proof
+        );
+
+        ProductMetadata memory meta = products[product_id];
+        require(meta.h != 0x0);
+
+        require(reviews_submitted[nullifierHash][meta.id] == false);
+
+        uint256 sender_purchases = purchase_counts_addr[msg.sender][product_id] + purchase_counts_worldid[nullifierHash][product_id];
+        require(sender_purchases > 0);
+
+        reviews_submitted[nullifierHash][meta.id] = true;
+        reviews[id] = Review(id, h, product_id);
     }
 }
