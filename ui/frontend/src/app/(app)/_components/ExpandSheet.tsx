@@ -8,6 +8,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import { ProductForm } from "./ProductForm";
+
 export const ExpandSheet: FC<{
   children: ReactNode;
   id: string;
@@ -20,12 +22,14 @@ export const ExpandSheet: FC<{
   return (
     <Sheet>
       <SheetTrigger className="text-primary text-left">{children}</SheetTrigger>
-      <SheetContent className="sm:max-w-[800rem]">
+      <SheetContent className="sm:max-w-[30rem] p-7 overflow-auto">
         <SheetHeader>
           <SheetTitle>{id}</SheetTitle>
         </SheetHeader>
-        <div className="flex flex-col gap-5 mt-10 pb-9 overflow-auto max-h-full">
-          <div className="text-xl font-bold">Product details</div>
+        <div className="flex flex-col gap-5 max-h-full relative">
+          {/* <div className="text-xl font-bold">Product details</div> */}
+
+          <ProductForm />
         </div>
       </SheetContent>
     </Sheet>
