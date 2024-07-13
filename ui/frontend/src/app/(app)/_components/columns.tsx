@@ -5,6 +5,7 @@ import { ColumnDef, RowData } from "@tanstack/react-table";
 
 // This type is used to define the shape of our data.
 export type DataFormat = {
+  id: string;
   name: string;
   price: number;
   totalSales: number;

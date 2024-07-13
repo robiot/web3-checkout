@@ -4,20 +4,16 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  OnChangeFn,
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { ChevronDown, ChevronsUpDown, ChevronUp } from "lucide-react";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -28,11 +24,8 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
-export type DataFormat = {
-  name: string;
-  price: number;
-  totalSales: number;
-};
+import { DataFormat } from "./columns";
+import { ExpandSheet } from "./ExpandSheet";
 
 export const DataTable: FC<{
   isSubTable: boolean; // used to indicate if its inside a sheet, so not recursive
@@ -41,36 +34,12 @@ export const DataTable: FC<{
 
   header?: ReactNode;
 
-  // set
-  setActivePage: (page: number) => void;
-  setColumnFilters: OnChangeFn<ColumnFiltersState>;
-
-  columnFilters: ColumnFiltersState;
-  currentPageData: UseQueryResult<
-    {
-      data: DataFormat[];
-      totalPages: number;
-    },
-    Error
-  >;
-}> = ({
-  header,
-  isSubTable,
-  columns,
-  setActivePage,
-  setColumnFilters,
-  columnFilters,
-  currentPageData,
-}) => {
+  currentPageData: UseQueryResult<DataFormat[], Error>;
+}> = ({ header, isSubTable, columns, currentPageData }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  // reset page when filters change
-  useEffect(() => {
-    setActivePage(1);
-  }, [columnFilters, setActivePage]);
-
   const table = useReactTable({
-    data: currentPageData.data?.data || [],
+    data: currentPageData.data || [],
     columns: columns,
 
     getCoreRowModel: getCoreRowModel(),
@@ -79,10 +48,8 @@ export const DataTable: FC<{
 
     // events
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     state: {
       sorting,
-      columnFilters,
     },
     initialState: {
       pagination: {
@@ -98,16 +65,8 @@ export const DataTable: FC<{
   });
 
   return (
-    <Card className={cn(isSubTable && "border-0")}>
-      <CardContent className={cn(isSubTable && "p-0", "flex flex-col gap-2")}>
-        {!isSubTable && (
-          <div className="flex justify-between items-end gap-2">
-            <div className="p-6 flex flex-col gap-3 mt-4">{header}</div>
-
-            {/* <Filter table={table} /> */}
-          </div>
-        )}
-
+    <div className="flex flex-col">
+      <div className={cn("p-0", "flex flex-col gap-2")}>
         <div className="bg-white rounded-md border text-xs max-h-full">
           <Table>
             <TableHeader>
@@ -118,7 +77,7 @@ export const DataTable: FC<{
                       key={header.id}
                       className={cn(
                         header.column.getCanSort() &&
-                          "cursor-pointer select-none",
+                          "cursor-pointer select-none"
                       )}
                       onClick={header.column.getToggleSortingHandler()}
                       style={{
@@ -131,7 +90,7 @@ export const DataTable: FC<{
                           ? null
                           : flexRender(
                               header.column.columnDef.header,
-                              header.getContext(),
+                              header.getContext()
                             )}
 
                         <div className="text-sm">
@@ -171,9 +130,21 @@ export const DataTable: FC<{
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-xs">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+                        {cell.column.id === "name" ? (
+                          <ExpandSheet
+                            id={cell.getValue() as string}
+                            active={!isSubTable}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </ExpandSheet>
+                        ) : (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )
                         )}
                       </TableCell>
                     ))}
@@ -192,54 +163,16 @@ export const DataTable: FC<{
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-      <CardFooter className="flex w-full justify-between">
+      </div>
+      <div className="mt-5 flex w-full justify-between">
         <div className="text-xs text-muted-foreground">
           Showing{" "}
           <strong>
             {(table.getState().pagination.pageIndex - 1) * 10}-
             {table.getState().pagination.pageIndex * 10}
           </strong>{" "}
-          of <strong>{currentPageData.data?.totalPages}</strong> rows
         </div>
-
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              const previousPage = Math.max(
-                table.getState().pagination.pageIndex - 1,
-                1,
-              );
-
-              setActivePage(previousPage); // will auto refetch as we have it as dependency
-
-              table.setPageIndex(previousPage);
-            }}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              const nextPage = Math.max(
-                table.getState().pagination.pageIndex + 1,
-                1,
-              );
-
-              setActivePage(nextPage); // will auto refetch as we have it as dependency
-
-              table.setPageIndex(nextPage);
-            }}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
