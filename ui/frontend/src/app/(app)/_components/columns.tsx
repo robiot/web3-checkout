@@ -21,6 +21,13 @@ declare module "@tanstack/react-table" {
 
 export const columns_main: ColumnDef<DataFormat>[] = [
   {
+    accessorKey: "id",
+    header: "ID",
+    meta: {
+      filterVariant: "text",
+    },
+  },
+  {
     accessorKey: "name",
     header: "Name",
     meta: {

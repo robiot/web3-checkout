@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { columns_main, DataFormat } from "./_components/columns";
 import { DataTable } from "./_components/data-table";
+import { ExpandSheet } from "./_components/ExpandSheet";
 
 const ProductsPage = () => {
   const data = useQuery({
@@ -28,10 +29,12 @@ const ProductsPage = () => {
     <Container>
       <div className="mb-10 mt-24 flex justify-between items-center">
         <h1 className="text-3xl font-medium">Products</h1>
-        <Button className="gap-2 rounded-xl">
-          <Plus />
-          Create New Product
-        </Button>
+        <ExpandSheet id="Thing" active>
+          <Button className="gap-2 rounded-xl">
+            <Plus />
+            Create New Product
+          </Button>
+        </ExpandSheet>
       </div>
 
       <DataTable

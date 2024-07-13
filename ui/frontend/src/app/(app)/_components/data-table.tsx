@@ -130,7 +130,7 @@ export const DataTable: FC<{
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-xs">
-                        {cell.column.id === "name" ? (
+                        {cell.column.id === "id" ? (
                           <ExpandSheet
                             id={cell.getValue() as string}
                             active={!isSubTable}
