@@ -8,6 +8,7 @@ import { Stars } from "@/components/common/Stars";
 
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
+import { Swap } from "./_components/Swap";
 import { VerifyPage } from "./_components/VerifyPage";
 
 const CheckoutPage = () => {
@@ -95,16 +96,9 @@ const CheckoutPage = () => {
 
             <VerifyPage />
 
-            <PayPage />
-            {/* {page == "verify" && (
-              <VerifyPage
-                next={() => {
-                  setPage("pay");
-                }}
-              />
-            )}
+            <Swap />
 
-            {page == "pay" && <PayPage next={() => {}} />} */}
+            <PayPage />
           </div>
         </Container>
       </div>
