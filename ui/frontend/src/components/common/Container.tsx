@@ -17,7 +17,7 @@ export const Container: FC<{
         size == "large" && "max-w-5xl",
         size == "small" && "max-w-[58rem]",
 
-        className
+        className,
       )}
     >
       {children}
