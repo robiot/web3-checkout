@@ -1,29 +1,33 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { IDKitWidget, VerificationLevel } from "@worldcoin/idkit";
-import { Sparkles } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { useAccount } from "wagmi";
 
 import { Container } from "@/components/common/Container";
 import { Stars } from "@/components/common/Stars";
 import { Button } from "@/components/ui/button";
-import { enviroment } from "@/lib/enviroment";
 
-const ProductsPage = () => {
-  const data = useQuery({
-    queryKey: ["products"],
-    queryFn: () => {
-      return [
-        {
-          id: "192h9d28du",
-          name: "Product 1",
-          price: 100,
-          totalSales: 100,
-        },
-      ];
-    },
-  });
+import { ConnectPage } from "./_components/ConnectPage";
+import { VerifyPage } from "./_components/VerifyPage";
+
+const CheckoutPage = () => {
+  // const data = useQuery({
+  //   queryKey: ["products"],
+  //   queryFn: () => {
+  //     return [
+  //       {
+  //         id: "192h9d28du",
+  //         name: "Product 1",
+  //         price: 100,
+  //         totalSales: 100,
+  //       },
+  //     ];
+  //   },
+  // });
+  const account = useAccount();
+
+  const [page, setPage] = useState<"connect" | "verify" | "pay">("connect");
 
   return (
     <div className="flex flex-col md:flex-row h-screen mx-auto">
@@ -66,7 +70,7 @@ const ProductsPage = () => {
       </div>
 
       <div className="h-screen md:w-1/2 p-5">
-        <Container className="mr-auto ml-20 max-w-[30rem]">
+        <Container className="mr-auto md:ml-20 max-w-[30rem]">
           <div className="text-lx pt-16">Pay with crypto</div>
 
           <div className="border border-border p-4 rounded-xl mt-8">
@@ -79,31 +83,35 @@ const ProductsPage = () => {
               View reviews
             </Button>
           </div>
-          <IDKitWidget
-            action="report"
-            // signal="my_signal"
-            app_id={enviroment.WI_APP_ID}
-            onSuccess={(_result) => {
-              // todo antony
-              // setIsVerified(true);
-              // setIDData(result);
-            }}
-            verification_level={VerificationLevel.Orb}
-            handleVerify={(_result) => {
-              console.log("you verified!!@");
-            }}
-          >
-            {({ open }) => (
-              <Button onClick={open} className="bg-black gap-3 w-fit" size="lg">
-                <Sparkles />
-                Verify with World ID
-              </Button>
+
+          <div className="flex justify-between py-6">
+            <span>Total</span>
+            <span>9 USD</span>
+          </div>
+
+          <div className="border-t border-border w-full" />
+
+          <div className="pt-6">
+            {page == "connect" && (
+              <ConnectPage
+                next={() => {
+                  setPage("verify");
+                }}
+              />
             )}
-          </IDKitWidget>
+
+            {page == "verify" && (
+              <VerifyPage
+                next={() => {
+                  setPage("pay");
+                }}
+              />
+            )}
+          </div>
         </Container>
       </div>
     </div>
   );
 };
 
-export default ProductsPage;
+export default CheckoutPage;
