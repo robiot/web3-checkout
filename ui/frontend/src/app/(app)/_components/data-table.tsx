@@ -35,7 +35,7 @@ export const DataTable: FC<{
   header?: ReactNode;
 
   currentPageData: UseQueryResult<DataFormat[], Error>;
-}> = ({ header, isSubTable, columns, currentPageData }) => {
+}> = ({ isSubTable, columns, currentPageData }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({

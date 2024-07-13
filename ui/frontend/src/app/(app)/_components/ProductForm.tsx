@@ -1,9 +1,8 @@
 /* eslint-disable unicorn/no-await-expression-member */
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Trash } from "lucide-react";
 import React, { FC, ReactNode, useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { useWriteContract } from "wagmi";
 import { z } from "zod";
@@ -16,15 +15,13 @@ import { CheckoutABI } from "@/lib/abi";
 import { enviroment } from "@/lib/enviroment";
 import { hashObject } from "@/lib/utils";
 
-import { ImageDrop } from "./ImageDrop";
-
 // Define Zod schema
 const formSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   price: z.number().positive("Price must be a positive number"),
-  mediaHashes: z.array(z.object({ value: z.string() })),
+  media: z.string().url().optional(),
   // requireRealHuman: z.boolean(),
   purchaseLimitPerHuman: z.number().int(),
 });
@@ -40,9 +37,13 @@ const Ero: FC<{ children: ReactNode }> = ({ children }) => {
   return <p className="text-red-600 my-2 text-sm">{children}</p>;
 };
 
-export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
+export const ProductForm: FC<{
+  kind: "create" | "modify";
+  defaultValues?: Partial<FormData>;
+}> = ({ kind, defaultValues }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    defaultValues,
   });
 
   const account = useAccount();
@@ -50,15 +51,8 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
   } = form;
-
-  const imagesFieldArray = useFieldArray({
-    control,
-    name: "mediaHashes" as never,
-    keyName: "value",
-  });
 
   // ABI
 
@@ -88,7 +82,7 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
           created_by: account.address as string,
           name: data.name,
           description: data.description,
-          media: [""],
+          media: [data.media],
           price: Math.trunc(Number(data.price) * 100),
           requireWorldCoin: Number(data.purchaseLimitPerHuman) > 0,
           limitPerHuman: data.purchaseLimitPerHuman,
@@ -107,7 +101,7 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
 
       console.log("writing contracto");
       productContractWrite.writeContract({
-        address: "0xd37de061784c153f40bad5097aeb97d25c0c4be3", //hardcoded
+        address: enviroment.CONTRACT_ADDRESS, //hardcoded
         abi: CheckoutABI,
         functionName: "addProduct",
         args: [
@@ -123,9 +117,56 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
     },
   });
 
+  const modifyProduct = useMutation({
+    mutationKey: ["modify_product"],
+    mutationFn: async (data: FormData) => {
+      // For
+      const response = await fetch(
+        `${enviroment.BACKEND_URL}/product/${data.id!}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            created_by: account.address as string,
+            name: data.name,
+            description: data.description,
+            media: [data.media],
+            price: Math.trunc(Number(data.price) * 100),
+            requireWorldCoin: Number(data.purchaseLimitPerHuman) > 0,
+            limitPerHuman: data.purchaseLimitPerHuman,
+          }),
+        },
+      );
+
+      if (response.status !== 200) {
+        alert("Error");
+
+        return;
+      }
+
+      console.log("writing contracto");
+      productContractWrite.writeContract({
+        address: enviroment.CONTRACT_ADDRESS, //hardcoded
+        abi: CheckoutABI,
+        functionName: "updateProduct",
+        args: [
+          "0x" + data.id?.replaceAll(/-/g, ""),
+          BigInt(data.price) * BigInt(10_000),
+          data?.purchaseLimitPerHuman,
+          account.address,
+          "0x" + (await hashObject(data)).toString("hex"),
+        ],
+      });
+    },
+  });
+
   const onSubmit = (data: FormData) => {
     if (kind == "create") {
       createProduct.mutate(data);
+    } else if (kind == "modify") {
+      modifyProduct.mutate(data);
     }
   };
 
@@ -140,10 +181,10 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
         console.log("invalid", thing);
       })}
     >
-      <div>
+      {/* <div>
         <Label>ID</Label>
         <Input {...register("id")} disabled />
-      </div>
+      </div> */}
 
       <div>
         <Label>Name</Label>
@@ -165,41 +206,8 @@ export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
 
       <div>
         <Label>Media</Label>
-
-        <ImageDrop />
-
-        {imagesFieldArray.fields.length > 0 && (
-          <>
-            <p className="mt-6 text-sm mb-2 text-foreground/60">Uploads:</p>
-            <div className="flex flex-col gap-2">
-              {imagesFieldArray.fields.map((field, index) => (
-                <div
-                  key={`agreement_field_${index}`}
-                  className="flex gap-2 h-fit"
-                >
-                  <Input
-                    {...register(`agreements.${index}.value` as any, {
-                      required: true,
-                    })}
-                    placeholder="Agreement"
-                    disabled
-                  />
-                  <Button
-                    className="w-fit h-12 flex-1"
-                    tabIndex={-1}
-                    onClick={() => {
-                      imagesFieldArray.remove(index);
-                    }}
-                  >
-                    <Trash />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {errors.mediaHashes && <Ero>{errors.mediaHashes.message}</Ero>}
+        <Input {...register("media")} placeholder="Image url" />
+        {errors.name && <Ero>{errors.name.message}</Ero>}
       </div>
 
       <div>

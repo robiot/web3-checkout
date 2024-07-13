@@ -16,7 +16,7 @@ export const ImageDrop: FC = () => {
       const response = await fetch(`${enviroment.BACKEND_URL}/ipfs/upload`, {
         method: "POST",
         body: formData,
-      }).catch((error) => {
+      }).catch((_error) => {
         alert("Error occured");
       });
 
