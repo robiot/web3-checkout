@@ -10,18 +10,15 @@ import {
 
 import { ProductForm } from "./ProductForm";
 
-export const ExpandSheet: FC<{
+export const ExpandCreate: FC<{
   children: ReactNode;
   id: string;
-  active: boolean;
-}> = ({ children, id, active }) => {
-  if (!active) {
-    return <>{children}</>;
-  }
-
+}> = ({ children, id }) => {
   return (
     <Sheet>
-      <SheetTrigger className="text-primary text-left">{children}</SheetTrigger>
+      <SheetTrigger className="text-primary text-left" asChild>
+        {children}
+      </SheetTrigger>
       <SheetContent className="sm:max-w-[30rem] p-7 overflow-auto">
         <SheetHeader>
           <SheetTitle>{id}</SheetTitle>
@@ -29,7 +26,7 @@ export const ExpandSheet: FC<{
         <div className="flex flex-col gap-5 max-h-full relative">
           {/* <div className="text-xl font-bold">Product details</div> */}
 
-          <ProductForm kind="modify" />
+          <ProductForm kind="create" />
         </div>
       </SheetContent>
     </Sheet>

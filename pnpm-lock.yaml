@@ -10,9 +10,11 @@ importers:
       '@eslint/js': ^9.7.0
       '@sinclair/typebox': ^0.32.34
       '@swc/core': 1.7.0-nightly-20240713.1
+      '@types/cors': ^2.8.17
       '@types/express': ^4.17.21
       '@types/express-serve-static-core': ^4.19.5
       '@types/node': ^20
+      cors: ^2.8.5
       eslint: ^9.7.0
       eslint-plugin-prettier: 5.0.0
       eslint-plugin-robiot: ^1.0.1
@@ -30,6 +32,8 @@ importers:
       typescript-eslint: ^7.16.0
     dependencies:
       '@sinclair/typebox': 0.32.34
+      '@types/cors': 2.8.17
+      cors: 2.8.5
       eslint-plugin-robiot: 1.0.1_6vywu2gqbj3r7jxextcva2frji
       express: 4.19.2
       http-status-codes: 2.3.0
@@ -2112,6 +2116,12 @@ packages:
       '@types/node': 20.14.10
     dev: true
 
+  /@types/cors/2.8.17:
+    resolution: {integrity: sha512-8CGDvrBj1zgo2qE+oS3pOCyYNqCPryMWY2bGfwA0dcfopWGgxs+78df0Rs3rc9THP4JkOhLsAa+15VdpAqkcUA==}
+    dependencies:
+      '@types/node': 20.14.10
+    dev: false
+
   /@types/debug/4.1.12:
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
     dependencies:
@@ -3987,6 +3997,14 @@ packages:
 
   /core-util-is/1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
+    dev: false
+
+  /cors/2.8.5:
+    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
+    engines: {node: '>= 0.10'}
+    dependencies:
+      object-assign: 4.1.1
+      vary: 1.1.2
     dev: false
 
   /crc-32/1.2.2:

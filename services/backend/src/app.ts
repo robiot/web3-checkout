@@ -2,6 +2,7 @@ import express, { json } from "express";
 
 import pg from "./pg";
 import ProductHandler from "./routes/product/product";
+import cors from "cors";
 
 const router = express();
 
@@ -28,6 +29,7 @@ export type Review = {
 (async () => {
   try {
     // Check if the table exists, and create it if it doesn't
+
     const existsProducts = await pg.schema.hasTable("products");
 
     if (!existsProducts) {
@@ -74,9 +76,11 @@ export type Review = {
   }
 })();
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-
+router.use(cors());
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 router.use(json());
 router.use("/product", ProductHandler);
-
 router.listen(8080, () => {});

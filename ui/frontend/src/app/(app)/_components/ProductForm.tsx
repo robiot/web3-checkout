@@ -1,28 +1,32 @@
+/* eslint-disable unicorn/no-await-expression-member */
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
-import React, { FC, ReactNode } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import React, { FC, ReactNode, useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { CheckoutABI } from "@/lib/abi";
+import { enviroment } from "@/lib/enviroment";
+import { hashObject } from "@/lib/utils";
 
 import { ImageDrop } from "./ImageDrop";
 
 // Define Zod schema
 const formSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   price: z.number().positive("Price must be a positive number"),
   mediaHashes: z.array(z.object({ value: z.string() })),
-  requireRealHuman: z.boolean(),
-  purchaseLimitPerHuman: z
-    .number()
-    .int()
-    .min(1, "Purchase limit must be at least 1"),
+  // requireRealHuman: z.boolean(),
+  purchaseLimitPerHuman: z.number().int(),
 });
 
 // Define form data type based on the schema
@@ -36,14 +40,12 @@ const Ero: FC<{ children: ReactNode }> = ({ children }) => {
   return <p className="text-red-600 my-2 text-sm">{children}</p>;
 };
 
-type MyValues = {
-  mediaHashes: { value: number }[];
-};
-
-export const ProductForm = () => {
+export const ProductForm: FC<{ kind: "create" | "modify" }> = ({ kind }) => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
+
+  const account = useAccount();
 
   const {
     register,
@@ -58,12 +60,86 @@ export const ProductForm = () => {
     keyName: "value",
   });
 
+  // ABI
+
+  const productContractWrite = useWriteContract();
+
+  const waitForWrite = useWaitForTransactionReceipt({
+    hash: productContractWrite.data,
+  });
+
+  useEffect(() => {
+    if (waitForWrite.isSuccess) {
+      window.location.reload();
+    }
+  }, [waitForWrite.isSuccess]);
+
+  const createProduct = useMutation({
+    mutationKey: ["create_product"],
+    mutationFn: async (data: FormData) => {
+      console.log("hello???");
+      // For
+      const response = await fetch(`${enviroment.BACKEND_URL}/product`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          created_by: account.address as string,
+          name: data.name,
+          description: data.description,
+          media: [""],
+          price: Math.trunc(Number(data.price) * 100),
+          requireWorldCoin: Number(data.purchaseLimitPerHuman) > 0,
+          limitPerHuman: data.purchaseLimitPerHuman,
+        }),
+      });
+
+      if (response.status !== 200) {
+        alert("Error");
+
+        return;
+      }
+
+      const jsonData = (await response.json()) as {
+        data: { id: string; price: number; limitPerHuman: number }; // there is more
+      };
+
+      console.log("writing contracto");
+      productContractWrite.writeContract({
+        address: "0xd37de061784c153f40bad5097aeb97d25c0c4be3", //hardcoded
+        abi: CheckoutABI,
+        functionName: "addProduct",
+        args: [
+          "0x" + jsonData.data.id.replaceAll(/-/g, ""),
+          "0x" + (await hashObject(jsonData.data)).toString("hex"),
+          BigInt(jsonData.data.price) * BigInt(10_000),
+          jsonData.data.limitPerHuman,
+          account.address,
+        ],
+      });
+
+      console.log("Here is your id monseiror", jsonData.data.id);
+    },
+  });
+
   const onSubmit = (data: FormData) => {
-    console.log(data);
+    if (kind == "create") {
+      createProduct.mutate(data);
+    }
   };
 
+  const isLoading =
+    createProduct.isPending ||
+    productContractWrite.isPending ||
+    (productContractWrite.isSuccess && waitForWrite.isPending);
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit, (thing) => {
+        console.log("invalid", thing);
+      })}
+    >
       <div>
         <Label>ID</Label>
         <Input {...register("id")} disabled />
@@ -83,7 +159,7 @@ export const ProductForm = () => {
 
       <div>
         <Label>Price in $USDC</Label>
-        <Input type="number" {...register("price", { valueAsNumber: true })} />
+        <Input {...register("price", { valueAsNumber: true })} />
         {errors.price && <Ero>{errors.price.message}</Ero>}
       </div>
 
@@ -127,30 +203,6 @@ export const ProductForm = () => {
       </div>
 
       <div>
-        <Label>Worldcoin</Label>
-        <div className="flex gap-4 items-center mt-4">
-          <Controller
-            render={({ field }) => (
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            )}
-            control={control}
-            name="requireRealHuman"
-          />
-
-          <div className="text-foreground/80">
-            Requires real human verification
-          </div>
-        </div>
-
-        {errors.requireRealHuman && (
-          <Ero>{errors.requireRealHuman.message}</Ero>
-        )}
-      </div>
-
-      <div>
         <Label>Purchase Limit Per Human (0 for none)</Label>
         <Input
           type="number"
@@ -163,7 +215,14 @@ export const ProductForm = () => {
 
       <div className="my-8 flex gap-4">
         <Button variant="secondary">Cancel</Button>
-        <Button className="flex-1">Save changes</Button>
+        <Button
+          className="flex-1 flex gap-4"
+          type="submit"
+          disabled={isLoading}
+        >
+          {isLoading && <Spinner size="sm" className="text-background" />}
+          Save changes
+        </Button>
       </div>
     </form>
   );
