@@ -8,7 +8,8 @@ export type DataFormat = {
   id: string;
   name: string;
   price: number;
-  totalSales: number;
+  created_by: string;
+  // totalSales: number;
 };
 
 declare module "@tanstack/react-table" {
@@ -37,13 +38,6 @@ export const columns_main: ColumnDef<DataFormat>[] = [
   {
     accessorKey: "price",
     header: "Price",
-    meta: {
-      filterVariant: "number",
-    },
-  },
-  {
-    accessorKey: "totalSales",
-    header: "Total Sales",
     meta: {
       filterVariant: "number",
     },

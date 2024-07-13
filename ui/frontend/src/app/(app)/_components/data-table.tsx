@@ -135,10 +135,7 @@ export const DataTable: FC<{
                             id={cell.getValue() as string}
                             active={!isSubTable}
                           >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
+                            {(cell.getValue() as string).slice(0, 8)}
                           </ExpandSheet>
                         ) : (
                           flexRender(
