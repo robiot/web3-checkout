@@ -2,17 +2,16 @@ import "@/styles/index.css";
 import "@/styles/globals.css";
 
 import type { Metadata } from "next";
-import { Inter, Noto_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import { ReactNode } from "react";
+import { cookieToInitialState } from "wagmi";
 
+import { ClientProviders } from "@/components/ClientProviders";
 import { Analytics } from "@/components/common/Analytics";
 import { MetaDescription, MetaTitle } from "@/lib/content/meta";
 import { cn } from "@/lib/utils";
-import { ClientProviders } from "@/components/ClientProviders";
-
-import { cookieToInitialState } from 'wagmi';
 import { config } from "@/lib/WagmiConfig";
-import { headers } from 'next/headers';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const initialState = cookieToInitialState(config, headers().get('cookie'))
+  const initialState = cookieToInitialState(config, headers().get("cookie"));
 
   return (
     <html lang="en">
