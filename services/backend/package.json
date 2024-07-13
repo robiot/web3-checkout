@@ -12,7 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "@sinclair/typebox": "^0.32.34",
-    "@web3-storage/w3up-client": "^15.0.0",
     "eslint-plugin-robiot": "^1.0.1",
     "express": "^4.19.2",
     "http-status-codes": "^2.3.0",

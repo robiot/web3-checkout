@@ -64,7 +64,7 @@ contract Web3Checkout {
     }
 
     function hashOfReview(bytes16 id) public view returns (bytes32) {
-        return reviews[id].h
+        return reviews[id].h;
     }
 
     function addProduct(bytes16 id, bytes32 h, uint256 price, uint256 purchase_limit, address payee) public {

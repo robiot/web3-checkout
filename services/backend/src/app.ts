@@ -75,8 +75,8 @@ export type Review = {
 })();
 
 // @ts-ignore
-router.use(json());
 
+router.use(json());
 router.use("/product", ProductHandler);
 
 router.listen(8080, () => {});
