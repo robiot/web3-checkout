@@ -46,6 +46,22 @@ ProductHandler.post("/", async (request, response) => {
   return respond(response, 200, newProduct);
 });
 
+ProductHandler.patch("/:id", async (request, response) => {
+  if (!Value.Check(ProductSchema, request.body)) {
+    return reject(response, 400);
+  }
+
+  await pg<Product>("products")
+    .update({
+      ...request.body,
+    })
+    .where({
+      id: request.params.id,
+    });
+
+  return respond(response, 200);
+});
+
 ProductHandler.delete("/:id", async (request, response) => {
   await pg<Product>("products")
     .where({

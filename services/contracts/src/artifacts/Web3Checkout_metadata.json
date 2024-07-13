@@ -44,20 +44,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "nullifierHash",
-						"type": "uint256"
-					}
-				],
-				"name": "DuplicateNullifier",
-				"type": "error"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
 					},
 					{
 						"internalType": "bytes32",
@@ -88,9 +77,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
 					}
 				],
 				"name": "hashOf",
@@ -107,9 +96,28 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
+					}
+				],
+				"name": "hashOfReview",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes16",
+						"name": "id",
+						"type": "bytes16"
 					}
 				],
 				"name": "makePayment",
@@ -120,9 +128,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
 					},
 					{
 						"internalType": "address",
@@ -166,9 +174,9 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
 					}
 				],
 				"name": "removeProduct",
@@ -179,9 +187,52 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint128",
+						"internalType": "bytes16",
+						"name": "product_id",
+						"type": "bytes16"
+					},
+					{
+						"internalType": "bytes16",
 						"name": "id",
-						"type": "uint128"
+						"type": "bytes16"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "h",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "signal",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "root",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nullifierHash",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256[8]",
+						"name": "proof",
+						"type": "uint256[8]"
+					}
+				],
+				"name": "submitReview",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes16",
+						"name": "id",
+						"type": "bytes16"
 					},
 					{
 						"internalType": "uint256",
@@ -238,11 +289,11 @@
 	},
 	"sources": {
 		"src/Web3Checkout.sol": {
-			"keccak256": "0xb8c9f2d8e865a898d58f1f066b4aae1b0d32bfc6afae8004a8031dab6fa93e06",
+			"keccak256": "0x97ecbe37a4df5149fbaebfaee73c96bcfa64981f104401a3432b5175a8a324ab",
 			"license": "UNLICENSED",
 			"urls": [
-				"bzz-raw://0a9d4d9f765c813673ebc0ee50a3f2e71ff8c56c20032db4b0f2ed7227c39714",
-				"dweb:/ipfs/Qmd7bVfgSVSQcMqkV7VUJTpCHuFLC9BAPMKXevoJpyeP7G"
+				"bzz-raw://1e3ea232bcc2723dc5b4beb4c618c0fd4c5e8b2444615cc0aa525e8f1c16fe7b",
+				"dweb:/ipfs/QmRZfxD9HNYWg1fLmRrDQdoputFdNeoNH4zJjUUwufmc1s"
 			]
 		},
 		"src/helpers/ByteHasher.sol": {
