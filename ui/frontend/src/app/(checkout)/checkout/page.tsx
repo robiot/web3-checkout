@@ -9,6 +9,7 @@ import { Stars } from "@/components/common/Stars";
 import { Button } from "@/components/ui/button";
 
 import { ConnectPage } from "./_components/ConnectPage";
+import { PayPage } from "./_components/PayPage";
 import { VerifyPage } from "./_components/VerifyPage";
 
 const CheckoutPage = () => {
@@ -32,7 +33,7 @@ const CheckoutPage = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen mx-auto">
       <div className="h-screen md:w-1/2 bg-[#F7F7F8] p-5">
-        <Container className="ml-auto mr-20 max-w-[30rem]">
+        <Container className="ml-auto mr-20 max-w-[30rem] flex flex-col">
           <div className="">TheCompany</div>
 
           <div className="mt-14 text-2xl">Coolest Afterparty Ticket</div>
@@ -56,7 +57,7 @@ const CheckoutPage = () => {
             formatted.
           </p>
 
-          <p className="flex items-center gap-2 flex-1">
+          <p className="flex items-center gap-2 mt-auto">
             Powered by
             <Image
               src="/logo.svg"
@@ -70,8 +71,8 @@ const CheckoutPage = () => {
       </div>
 
       <div className="h-screen md:w-1/2 p-5">
-        <Container className="mr-auto md:ml-20 max-w-[30rem]">
-          <div className="text-lx pt-16">Pay with crypto</div>
+        <Container className="mr-auto md:ml-20 max-w-[25rem]">
+          <div className="text-lx pt-20">Pay with crypto</div>
 
           <div className="border border-border p-4 rounded-xl mt-8">
             <div className="flex items-center gap-5">
@@ -107,6 +108,8 @@ const CheckoutPage = () => {
                 }}
               />
             )}
+
+            {page == "pay" && <PayPage next={() => {}} />}
           </div>
         </Container>
       </div>
