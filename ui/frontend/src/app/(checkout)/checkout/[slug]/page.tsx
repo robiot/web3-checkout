@@ -10,7 +10,7 @@ import { useProductsSingle } from "@/lib/useProductsSingle";
 
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
-import { Swap } from "./_components/Swap";
+import { ReviewsModal } from "./_components/ReviewsModal";
 import { VerifyPage } from "./_components/VerifyPage";
 
 interface PageProperties {
@@ -74,10 +74,12 @@ function CheckoutPage({ params }: PageProperties) {
           <div className="text-lx pt-20">Pay with crypto</div>
 
           <div className="mt-8">
-            <div className="flex items-center gap-5">
-              <Stars percent={80} />
-              <span className="text-foreground/60">140 reviews</span>
-            </div>
+            <ReviewsModal>
+              <button className="flex items-center gap-5 cursor-pointer">
+                <Stars percent={80} />
+                <span className="text-foreground/60">140 reviews</span>
+              </button>
+            </ReviewsModal>
 
             {/* <Button variant="ghost" className="w-full mt-6">
               View reviews
@@ -98,7 +100,7 @@ function CheckoutPage({ params }: PageProperties) {
 
             <VerifyPage />
 
-            <Swap />
+            {/* <Swap /> */}
 
             <PayPage />
           </div>
