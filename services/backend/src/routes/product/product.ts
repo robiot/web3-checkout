@@ -3,9 +3,10 @@ import { Value } from "@sinclair/typebox/value";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 
-import { Product } from "../app";
-import pg from "../pg";
-import { reject, respond } from "../util/response";
+import { Product } from "../../app";
+import pg from "../../pg";
+import { reject, respond } from "../../util/response";
+import ReviewHandler from "./review/review";
 
 const ProductHandler = Router();
 
@@ -20,7 +21,11 @@ const ProductSchema = Type.Object({
 });
 
 ProductHandler.get("/", async (request, response) => {
-  const data = await pg<Product>("products").select("*");
+  const data = request.query.created_by
+    ? await pg<Product>("products").select("*").where({
+        created_by: request.query.id,
+      })
+    : await pg<Product>("products").select("*");
 
   return respond(response, 200, data);
 });
@@ -50,5 +55,7 @@ ProductHandler.delete("/:id", async (request, response) => {
 
   return respond(response, 200);
 });
+
+ProductHandler.use("/:product_id/review", ReviewHandler);
 
 export default ProductHandler;

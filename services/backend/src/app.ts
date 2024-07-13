@@ -1,7 +1,7 @@
 import express, { json } from "express";
 
 import pg from "./pg";
-import ProductHandler from "./routes/product";
+import ProductHandler from "./routes/product/product";
 
 const router = express();
 
@@ -17,12 +17,20 @@ export type Product = {
   created_at: Date;
 };
 
+export type Review = {
+  id: string;
+  product_id: string;
+  score: number;
+  description: string;
+  created_at: Date;
+};
+
 (async () => {
   try {
     // Check if the table exists, and create it if it doesn't
-    const exists = await pg.schema.hasTable("products");
+    const existsProducts = await pg.schema.hasTable("products");
 
-    if (!exists) {
+    if (!existsProducts) {
       await pg.schema.createTable("products", (table) => {
         table.string("id").primary();
         table.string("created_by").notNullable();
@@ -37,10 +45,30 @@ export type Product = {
       console.log("Created products table!");
     }
 
-    // Query users
+    const existsReviews = await pg.schema.hasTable("reviews");
+
+    if (!existsReviews) {
+      await pg.schema.createTable("reviews", (table) => {
+        table.string("id").primary();
+        table.string("product_id").notNullable().index();
+        table.integer("score").notNullable();
+        table.string("description");
+        table.datetime("created_at");
+        table
+          .foreign("product_id")
+          .references("id")
+          .inTable("products")
+          .onDelete("CASCADE");
+      });
+
+      console.log("Reviews table created!");
+    }
+
     const products = await pg<Product>("products").select("*");
+    const reviews = await pg<Review>("reviews").select("*");
 
     console.log("Products:", products);
+    console.log("Reviews:", reviews);
   } catch (error) {
     console.error("Error:", error);
   }
