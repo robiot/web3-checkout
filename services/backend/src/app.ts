@@ -38,7 +38,7 @@ export type Review = {
         table.string("id").primary();
         table.string("created_by").notNullable();
         table.string("name");
-        table.string("description");
+        table.text("description");
         table.integer("price");
         table.specificType("media", "text ARRAY");
         table.boolean("requireWorldCoin");
@@ -56,7 +56,7 @@ export type Review = {
         table.string("id").primary();
         table.string("product_id").notNullable().index();
         table.integer("score").notNullable();
-        table.string("description");
+        table.text("description");
         table.datetime("created_at");
         table
           .foreign("product_id")
