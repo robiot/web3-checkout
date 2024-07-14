@@ -30,7 +30,8 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
         functionName: "approve",
         args: [
           enviroment.CONTRACT_ADDRESS,
-          BigInt(Math.trunc(price * 1.06 * 100)) * BigInt(10_000) + BigInt(100000),
+          BigInt(Math.trunc(price * 1.06 * 100)) * BigInt(10_000) +
+            BigInt(100_000),
         ],
       });
     },
