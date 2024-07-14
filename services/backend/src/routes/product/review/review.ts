@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Type } from "@sinclair/typebox";
 import { Value } from "@sinclair/typebox/value";
 import { Router } from "express";
@@ -9,7 +10,7 @@ import { generateReview } from "../../../lib/ai";
 import pg from "../../../pg";
 import { reject, respond } from "../../../util/response";
 
-const openai = new OpenAI({
+const _openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"], // This is the default and can be omitted
 });
 
@@ -23,7 +24,6 @@ const ReviewSchema = Type.Object({
 });
 
 ReviewHandler.get("/", async (request, response) => {
-  // eslint-disable-next-line unicorn/no-await-expression-member
   const data = (await pg<Review>("reviews").select("*")).filter(
     (r) => r.product_id === request.params.product_id,
   );
@@ -49,8 +49,6 @@ ReviewHandler.post("/", async (request, response) => {
     return reject(response, 400);
   }
 
-  await generateReview(product[0].id);
-
   const newReview: Review = {
     id: randomUUID(),
     created_at: new Date(),
@@ -59,6 +57,8 @@ ReviewHandler.post("/", async (request, response) => {
   };
 
   await pg<Review>("reviews").insert(newReview);
+
+  await generateReview(product[0].id);
 
   return respond(response, 200, newReview);
 });
