@@ -231,6 +231,29 @@
 				"inputs": [
 					{
 						"internalType": "bytes16",
+						"name": "product_id",
+						"type": "bytes16"
+					},
+					{
+						"internalType": "bytes16",
+						"name": "id",
+						"type": "bytes16"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "h",
+						"type": "bytes32"
+					}
+				],
+				"name": "submitReviewBasic",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes16",
 						"name": "id",
 						"type": "bytes16"
 					},
@@ -289,11 +312,11 @@
 	},
 	"sources": {
 		"src/Web3Checkout.sol": {
-			"keccak256": "0x97ecbe37a4df5149fbaebfaee73c96bcfa64981f104401a3432b5175a8a324ab",
+			"keccak256": "0xe3b025ce0811982c7268f779eb74678a638abc05d889cebb6d0b61a08f40a769",
 			"license": "UNLICENSED",
 			"urls": [
-				"bzz-raw://1e3ea232bcc2723dc5b4beb4c618c0fd4c5e8b2444615cc0aa525e8f1c16fe7b",
-				"dweb:/ipfs/QmRZfxD9HNYWg1fLmRrDQdoputFdNeoNH4zJjUUwufmc1s"
+				"bzz-raw://61f49774c1f6f82650b8b502139b0613938bd58771ca0ef5e8f568cd518985cd",
+				"dweb:/ipfs/QmP4UCciiiGorP4Eyb1YRb8h5baPVn6aJxgZMmcHxc5Hto"
 			]
 		},
 		"src/helpers/ByteHasher.sol": {

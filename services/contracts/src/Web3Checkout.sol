@@ -32,6 +32,7 @@ contract Web3Checkout {
     mapping(address => mapping(bytes16 => uint256)) internal purchase_counts_addr;
     mapping(uint256 => mapping(bytes16 => uint256)) internal purchase_counts_worldid;
     mapping(uint256 => mapping(bytes16 => bool)) internal reviews_submitted;
+    mapping(address => mapping(bytes16 => bool)) internal reviews_submitted2;
 
     IWorldID internal immutable worldId;
     uint256 internal immutable externalNullifier;
@@ -150,6 +151,24 @@ contract Web3Checkout {
         require(sender_purchases > 0);
 
         reviews_submitted[nullifierHash][meta.id] = true;
+        reviews[id] = Review(id, h, product_id);
+    }
+
+    function submitReviewBasic(
+        bytes16 product_id,
+        bytes16 id,
+        bytes32 h
+    ) public {
+    
+        ProductMetadata memory meta = products[product_id];
+        require(meta.h != 0x0);
+
+        require(reviews_submitted2[msg.sender][meta.id] == false);
+
+        uint256 sender_purchases = purchase_counts_addr[msg.sender][product_id];
+        require(sender_purchases > 0);
+
+        reviews_submitted2[msg.sender][meta.id] = true;
         reviews[id] = Review(id, h, product_id);
     }
 }

@@ -6,6 +6,7 @@ import {
 } from "@worldcoin/idkit";
 import Image from "next/image";
 import { FC, useEffect, useState } from "react";
+import { decodeAbiParameters, parseAbiParameters } from "viem";
 import {
   useAccount,
   useWaitForTransactionReceipt,
@@ -64,6 +65,10 @@ export const PayWC: FC<{ id: string; price: number }> = ({ id, price }) => {
           .slice(2)
           .match(/.{1,64}/g)
           ?.map((it) => "0x" + it),
+        decodeAbiParameters(
+          parseAbiParameters("uint256[8]"),
+          wcData.proof as `0x${string}`,
+        )[0],
       );
 
       productContractWrite.writeContract(
@@ -73,13 +78,13 @@ export const PayWC: FC<{ id: string; price: number }> = ({ id, price }) => {
           functionName: "makePaymentWorldId",
           args: [
             "0x" + id.replaceAll(/-/g, ""),
-            account.address,
+            account.address!,
             wcData.merkle_root,
             wcData.nullifier_hash,
-            wcData.proof
-              .slice(2)
-              .match(/.{1,64}/g)
-              ?.map((it) => "0x" + it),
+            decodeAbiParameters(
+              parseAbiParameters("uint256[8]"),
+              wcData.proof as `0x${string}`,
+            )[0],
           ],
         },
         { onError: console.log },
@@ -88,6 +93,8 @@ export const PayWC: FC<{ id: string; price: number }> = ({ id, price }) => {
   });
 
   useEffect(() => {
+    console.log({ a: waitForApprove.isSuccess });
+
     if (waitForApprove.isSuccess) {
       payNormal.mutate();
     }
@@ -119,7 +126,14 @@ export const PayWC: FC<{ id: string; price: number }> = ({ id, price }) => {
           }}
           verification_level={VerificationLevel.Orb}
           handleVerify={(_result) => {
-            console.log("you verified!!@");
+            console.log(
+              "you verified!!@",
+              _result,
+              decodeAbiParameters(
+                parseAbiParameters("uint256[8]"),
+                _result.proof as `0x${string}`,
+              )[0],
+            );
           }}
         >
           {({ open }) => (
@@ -145,7 +159,7 @@ export const PayWC: FC<{ id: string; price: number }> = ({ id, price }) => {
       <div className="flex w-full mt-5">
         <Button
           onClick={() => {
-            approve.mutate();
+            payNormal.mutate();
           }}
           disabled={wcData == undefined || isLoading || !account.address}
           className="w-full"
