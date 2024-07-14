@@ -28,7 +28,10 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
         address: enviroment.TOKEN_ADDRESS, //hardcoded
         abi: Erc20ABI,
         functionName: "approve",
-        args: [enviroment.CONTRACT_ADDRESS, BigInt(price) * BigInt(1_060_000)],
+        args: [
+          enviroment.CONTRACT_ADDRESS,
+          BigInt(Math.trunc(price * 1.06 * 100)) * BigInt(10_000) + BigInt(100000),
+        ],
       });
     },
   });

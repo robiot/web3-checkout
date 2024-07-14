@@ -73,6 +73,7 @@ export const ProductForm: FC<{
     mutationFn: async (data: FormData) => {
       console.log("hello???");
       // For
+      const _price = Math.ceil(Number(data.price) * 100);
       const response = await fetch(`${enviroment.BACKEND_URL}/product`, {
         method: "POST",
         headers: {
@@ -83,7 +84,7 @@ export const ProductForm: FC<{
           name: data.name,
           description: data.description,
           media: [data.media],
-          price: Math.trunc(Number(data.price) * 100),
+          price: _price,
           requireWorldCoin: Number(data.purchaseLimitPerHuman) > 0,
           limitPerHuman: data.purchaseLimitPerHuman,
         }),
@@ -107,7 +108,7 @@ export const ProductForm: FC<{
         args: [
           "0x" + jsonData.data.id.replaceAll(/-/g, ""),
           "0x" + (await hashObject(jsonData.data)).toString("hex"),
-          BigInt(jsonData.data.price) * BigInt(10_000),
+          BigInt(_price) * BigInt(10_000),
           jsonData.data.limitPerHuman,
           account.address,
         ],
@@ -121,6 +122,7 @@ export const ProductForm: FC<{
     mutationKey: ["modify_product"],
     mutationFn: async (data: FormData) => {
       // For
+      const _price = Math.ceil(Number(data.price) * 100);
       const response = await fetch(
         `${enviroment.BACKEND_URL}/product/${data.id!}`,
         {
@@ -133,7 +135,7 @@ export const ProductForm: FC<{
             name: data.name,
             description: data.description,
             media: [data.media],
-            price: Math.trunc(Number(data.price) * 100),
+            price: _price,
             requireWorldCoin: Number(data.purchaseLimitPerHuman) > 0,
             limitPerHuman: data.purchaseLimitPerHuman,
           }),
@@ -153,7 +155,7 @@ export const ProductForm: FC<{
         functionName: "updateProduct",
         args: [
           "0x" + data.id?.replaceAll(/-/g, ""),
-          BigInt(data.price) * BigInt(10_000),
+          BigInt(_price) * BigInt(10_000),
           data?.purchaseLimitPerHuman,
           account.address,
           "0x" + (await hashObject(data)).toString("hex"),
