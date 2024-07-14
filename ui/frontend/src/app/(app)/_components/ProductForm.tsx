@@ -29,11 +29,11 @@ const formSchema = z.object({
 // Define form data type based on the schema
 type FormData = z.infer<typeof formSchema>;
 
-const Label: FC<{ children: ReactNode }> = ({ children }) => {
+export const Label: FC<{ children: ReactNode }> = ({ children }) => {
   return <p className="text-foreground/80 mb-2 mt-8 text-sm">{children}</p>;
 };
 
-const Ero: FC<{ children: ReactNode }> = ({ children }) => {
+export const Ero: FC<{ children: ReactNode }> = ({ children }) => {
   return <p className="text-red-600 my-2 text-sm">{children}</p>;
 };
 

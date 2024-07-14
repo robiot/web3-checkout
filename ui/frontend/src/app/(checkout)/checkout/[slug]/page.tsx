@@ -10,7 +10,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useProductsSingle } from "@/lib/useProductsSingle";
 import { getAverageScore, useReviews } from "@/lib/useReviews";
 
-import { CompleteModal } from "./_components/CompleteModal";
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
 import { PayWC } from "./_components/PayWC";
@@ -52,7 +51,6 @@ function CheckoutPage({ params }: PageProperties) {
 
   return (
     <div className="flex flex-col md:flex-row h-screen mx-auto">
-      <CompleteModal id={params.slug} open={true} />
       <div className="h-screen md:w-1/2 bg-[#F7F7F8] p-5">
         <Container className="ml-auto mr-20 max-w-[30rem] flex flex-col">
           <div className="">

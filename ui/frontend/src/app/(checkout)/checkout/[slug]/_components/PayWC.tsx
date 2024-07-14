@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import { useMutation } from "@tanstack/react-query";
 import {
   IDKitWidget,

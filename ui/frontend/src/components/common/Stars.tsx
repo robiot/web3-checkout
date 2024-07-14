@@ -1,3 +1,5 @@
+/* eslint-disable unused-imports/no-unused-vars */
+/* eslint-disable unicorn/no-nested-ternary */
 import { Star } from "lucide-react";
 import { FC, useEffect } from "react";
 
@@ -46,7 +48,11 @@ export const StarClick: FC<{
       {...Array.from({ length: 5 })
         .fill(0)
         .map((_, index, __, v = (index + 1) * 20) => (
-          <button key={index} onClick={() => onClick(v)} className={"px-2"}>
+          <button
+            key={index}
+            onClick={() => onClick(v)}
+            className={"px-2 outline-none"}
+          >
             <OneStar
               percentage={
                 v >= value + 20

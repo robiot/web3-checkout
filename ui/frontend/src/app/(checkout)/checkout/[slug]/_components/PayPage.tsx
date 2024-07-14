@@ -12,6 +12,8 @@ import { CheckoutABI } from "@/lib/contract_abi";
 import { enviroment } from "@/lib/enviroment";
 import { Erc20ABI } from "@/lib/erc20_abi";
 
+import { CompleteModal } from "./CompleteModal";
+
 export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
   const account = useAccount();
 
@@ -68,6 +70,8 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
   }, [waitForApprove.isSuccess]);
 
   useEffect(() => {
+    console.log("changed", waitForProductWrite);
+
     if (waitForProductWrite.isSuccess) {
       // do stuff
       alert("Paid yipiieeeee!!");
@@ -81,17 +85,20 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
     (payNormal.isSuccess && waitForProductWrite.isPending);
 
   return (
-    <div className="flex w-full mt-5">
-      <Button
-        onClick={() => {
-          approve.mutate();
-        }}
-        disabled={isLoading || !account.address}
-        className="w-full"
-      >
-        {isLoading && <Spinner size="sm" className="text-background mr-3" />}
-        Pay
-      </Button>
-    </div>
+    <>
+      <CompleteModal id={id} open={waitForProductWrite.isSuccess} />
+      <div className="flex w-full mt-5">
+        <Button
+          onClick={() => {
+            approve.mutate();
+          }}
+          disabled={isLoading || !account.address}
+          className="w-full"
+        >
+          {isLoading && <Spinner size="sm" className="text-background mr-3" />}
+          Pay
+        </Button>
+      </div>
+    </>
   );
 };
