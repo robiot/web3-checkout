@@ -50,7 +50,6 @@ export const CompleteModal: FC<{
               onClick={(n) => form.setValue("score", n)}
               value={form.watch("score")}
             />
-            {form.watch("score")}
           </div>
         </DialogContent>
       </Dialog>

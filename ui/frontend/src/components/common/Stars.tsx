@@ -46,12 +46,17 @@ export const StarClick: FC<{
       {...Array.from({ length: 5 })
         .fill(0)
         .map((_, index, __, v = (index + 1) * 20) => (
-          <button key={index} onClick={() => onClick(v)}>
+          <button key={index} onClick={() => onClick(v)} className={"px-2"}>
             <OneStar
-              percentage={value <= v ? 100 : ((value - v) / 20) * 100}
+              percentage={
+                v >= value + 20
+                  ? 0
+                  : value >= v
+                    ? 100
+                    : ((20 - (v - value)) / 20) * 100
+              }
               size="md"
             />
-            {v} {v <= value ? 100 : ((value - v) / 20) * 100}
           </button>
         ))}
     </>
