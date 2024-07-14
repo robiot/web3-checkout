@@ -1,9 +1,20 @@
 import { Star } from "lucide-react";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 
-const OneStar: FC<{ percentage: number }> = ({ percentage }) => {
+import { cn } from "@/lib/utils";
+
+const OneStar: FC<{ percentage: number; size: string }> = ({
+  percentage,
+  size,
+}) => {
   return (
-    <div className="relative bg-secondary overflow-hidden text-white flex items-center justify-center h-10 w-10 p-0 rounded-xl">
+    <div
+      className={cn(
+        "relative bg-secondary overflow-hidden text-white flex items-center justify-center p-0",
+        size == "md" && "h-10 w-10 rounded-xl",
+        size == "sm" && "h-8 w-8 rounded",
+      )}
+    >
       <div
         className="absolute inset-0 h-full bg-primary"
         style={{
@@ -11,12 +22,46 @@ const OneStar: FC<{ percentage: number }> = ({ percentage }) => {
         }}
       />
 
-      <Star className="w-5 h-5 z-10" />
+      <Star
+        className={cn(
+          "z-10",
+          size == "md" && "h-5 w-5",
+          size == "sm" && "h-3 w-3",
+        )}
+      />
     </div>
   );
 };
 
-export const Stars: FC<{ percent: number }> = ({ percent }) => {
+export const StarClick: FC<{
+  onClick: (score: number) => void;
+  value: number;
+}> = ({ onClick, value }) => {
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
+
+  return (
+    <>
+      {...Array.from({ length: 5 })
+        .fill(0)
+        .map((_, index, __, v = (index + 1) * 20) => (
+          <button key={index} onClick={() => onClick(v)}>
+            <OneStar
+              percentage={value <= v ? 100 : ((value - v) / 20) * 100}
+              size="md"
+            />
+            {v} {v <= value ? 100 : ((value - v) / 20) * 100}
+          </button>
+        ))}
+    </>
+  );
+};
+
+export const Stars: FC<{ percent: number; size?: "sm" | "md" }> = ({
+  percent,
+  size = "md",
+}) => {
   // Calculate percentage for each star
   const fullStars = Math.floor(percent / 20);
   const partialStarPercentage = (percent % 20) * 5; // Each star represents 20%, so we multiply the remainder by 5
@@ -36,7 +81,7 @@ export const Stars: FC<{ percent: number }> = ({ percent }) => {
   return (
     <div className="flex gap-2">
       {starPercentages.map((percentage, index) => (
-        <OneStar key={index} percentage={percentage} />
+        <OneStar key={index} percentage={percentage} size={size} />
       ))}
     </div>
   );

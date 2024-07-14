@@ -2,12 +2,15 @@
 "use client";
 
 import Image from "next/image";
+import { useEnsName } from "wagmi";
 
 import { Container } from "@/components/common/Container";
 import { Stars } from "@/components/common/Stars";
 import { Spinner } from "@/components/ui/spinner";
 import { useProductsSingle } from "@/lib/useProductsSingle";
+import { getAverageScore, useReviews } from "@/lib/useReviews";
 
+import { CompleteModal } from "./_components/CompleteModal";
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
 import { PayWC } from "./_components/PayWC";
@@ -21,8 +24,24 @@ interface PageProperties {
 
 const formatCurrency = (number_?: number) => (number_ ?? 0).toFixed(2);
 
+function truncateAddress(address?: string) {
+  if (!address) return;
+
+  if (address.length <= 10) {
+    return address; // If the address is already short, no need to truncate
+  }
+
+  const start = address.slice(0, 5);
+  const end = address.slice(-5);
+
+  return `${start}...${end}`;
+}
+
 function CheckoutPage({ params }: PageProperties) {
   const product = useProductsSingle(params.slug);
+  const ens = useEnsName({ address: product.data?.created_by as any });
+
+  const reviews = useReviews(params.slug);
 
   if (product.isLoading)
     return (
@@ -33,9 +52,12 @@ function CheckoutPage({ params }: PageProperties) {
 
   return (
     <div className="flex flex-col md:flex-row h-screen mx-auto">
+      <CompleteModal id={params.slug} open={true} />
       <div className="h-screen md:w-1/2 bg-[#F7F7F8] p-5">
         <Container className="ml-auto mr-20 max-w-[30rem] flex flex-col">
-          <div className="">{product.data?.created_by}</div>
+          <div className="">
+            {ens.data ?? truncateAddress(product.data?.created_by)}
+          </div>
 
           <div className="mt-14 text-2xl">{product.data?.name}</div>
 
@@ -74,10 +96,12 @@ function CheckoutPage({ params }: PageProperties) {
           <div className="text-lx pt-20">Pay with crypto</div>
 
           <div className="mt-8">
-            <ReviewsModal>
+            <ReviewsModal id={params.slug}>
               <button className="flex items-center gap-5 cursor-pointer">
-                <Stars percent={80} />
-                <span className="text-foreground/60">140 reviews</span>
+                <Stars percent={getAverageScore(reviews.data?.reviews)} />
+                <span className="text-foreground/60">
+                  {reviews.data?.reviews.length} reviews
+                </span>
               </button>
             </ReviewsModal>
 

@@ -7,6 +7,7 @@ import {
 } from "wagmi";
 
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { CheckoutABI } from "@/lib/contract_abi";
 import { enviroment } from "@/lib/enviroment";
 import { Erc20ABI } from "@/lib/erc20_abi";
@@ -88,6 +89,7 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
         disabled={isLoading || !account.address}
         className="w-full"
       >
+        {isLoading && <Spinner size="sm" className="text-background mr-3" />}
         Pay
       </Button>
     </div>
