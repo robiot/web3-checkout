@@ -1,6 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { FC, useEffect } from "react";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 
 import { Button } from "@/components/ui/button";
 import { CheckoutABI } from "@/lib/contract_abi";
@@ -8,6 +12,8 @@ import { enviroment } from "@/lib/enviroment";
 import { Erc20ABI } from "@/lib/erc20_abi";
 
 export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
+  const account = useAccount();
+
   const productContractWrite = useWriteContract();
   const approveWrite = useWriteContract();
 
@@ -22,7 +28,7 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
   const approve = useMutation({
     mutationKey: ["approve_for", id],
     mutationFn: async () => {
-      console.log("paying");
+      console.log("approving");
 
       approveWrite.writeContract({
         address: enviroment.TOKEN_ADDRESS, //hardcoded
@@ -79,7 +85,7 @@ export const PayPage: FC<{ id: string; price: number }> = ({ id, price }) => {
         onClick={() => {
           approve.mutate();
         }}
-        disabled={isLoading}
+        disabled={isLoading || !account.address}
         className="w-full"
       >
         Pay

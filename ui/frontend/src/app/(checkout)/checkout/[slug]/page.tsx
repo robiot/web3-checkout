@@ -10,8 +10,8 @@ import { useProductsSingle } from "@/lib/useProductsSingle";
 
 import { ConnectPage } from "./_components/ConnectPage";
 import { PayPage } from "./_components/PayPage";
+import { PayWC } from "./_components/PayWC";
 import { ReviewsModal } from "./_components/ReviewsModal";
-import { VerifyPage } from "./_components/VerifyPage";
 
 interface PageProperties {
   params: {
@@ -110,11 +110,11 @@ function CheckoutPage({ params }: PageProperties) {
           <div className="pt-6 flex flex-col gap-3">
             <ConnectPage />
 
-            {product.data?.limitPerHuman! > 0 && <VerifyPage />}
-
-            {/* <Swap /> */}
-
-            <PayPage id={params.slug} price={product.data?.price!} />
+            {product.data?.limitPerHuman! > 0 ? (
+              <PayWC id={params.slug} price={product.data?.price!} />
+            ) : (
+              <PayPage id={params.slug} price={product.data?.price!} />
+            )}
           </div>
         </Container>
       </div>

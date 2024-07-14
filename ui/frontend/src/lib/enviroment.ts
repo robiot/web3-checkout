@@ -5,6 +5,6 @@ export const enviroment = {
 
   BACKEND_URL: "http://localhost:8080",
   CONTRACT_ADDRESS:
-    "0xd37de061784c153f40bad5097aeb97d25c0c4be3" as `0x${string}`,
+    "0xd4894e2dfdb6563bfde8bef56227cedcf8c4ecd0" as `0x${string}`,
   TOKEN_ADDRESS: "0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8" as `0x${string}`,
 };
